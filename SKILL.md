@@ -1,15 +1,15 @@
 ---
 name: returns-support-skill
-description: Use when designing, implementing, or reviewing customer-service workflows for return requests, order identification, policy-based alternatives, customer consent, and reliable execution. 适用于智能客服退货流程、方案白名单、挽留回复校验及防重复执行。
+description: Use when designing, implementing, or reviewing the product architecture and workflows of return-support assistants, including module boundaries, order identification, policy-based alternatives, customer consent, and reliable execution. 适用于售后客服产品架构、退货流程、方案白名单及防重复执行。
 ---
 
 # 智能客服退货与方案协商
 
-将退货诉求整理成可实现、可验证的客服流程。模型负责理解与表达；业务代码负责订单、资格、金额、权限和执行。保留顾客进入正常退货流程的出口。
+将退货诉求整理成可实现、可验证的客服流程与产品架构。模型负责理解与表达；业务代码负责订单、资格、金额、权限和执行。保留顾客进入正常退货流程的出口。
 
 ## 使用方式
 
-设计或实现时先读 [流程与状态](references/workflow.md)；定义数据、模型输出或执行接口时读 [数据与执行约定](references/contracts.md)；评审和验收时读 [行为验收](references/acceptance.md)。可校验的模型输出格式见 [回复 schema](schemas/offer-response.schema.json)，完整虚构示例见 [方案示例](examples/offer.json)。
+设计或评审产品架构时先读 [产品架构设计规范](references/architecture.md)，按其中的架构图、模块职责与权限边界落实；设计流程时读 [流程与状态](references/workflow.md)；定义数据、模型输出或执行接口时读 [数据与执行约定](references/contracts.md)；评审和验收时读 [行为验收](references/acceptance.md)。可校验的模型输出格式见 [回复 schema](schemas/offer-response.schema.json)，完整虚构示例见 [方案示例](examples/offer.json)。
 
 根据用户任务交付相应的产品说明、状态转换、接口约定、实现或评审结论。沿用已有项目的语言、接口和退货政策；本 skill 不要求搭建完整客服平台，也不限定渠道、模型、服务框架或业务系统。
 
@@ -18,6 +18,12 @@ description: Use when designing, implementing, or reviewing customer-service wor
 从现有资料确认订单查询及归属验证方式、商家政策与版本、生效日期、库存、退货期限、金额上限、禁止承诺、既有退货入口、人工转交入口、执行结果查询方式和统计口径。
 
 缺失项按影响标明：可继续设计并列为待接入；真实处理时，缺少资格或执行依据的路径停在澄清或人工转交。不得把示例金额、天数或次数当作真实商家政策。
+
+## 产品架构约束
+
+渠道统一接入会话编排；政策引擎输出确定的方案白名单；模型网关生成候选；防护层校验后回到编排展示；顾客明确接受后，执行器再次核验并幂等处理。渠道和模型不能直接调用订单或资金写接口，防护通过也不等于执行授权。
+
+这些职责可以位于同一应用内，不要求拆成多个服务。已有项目按逻辑模块映射，保留模型可替换性、政策版本和生效日期、业务数据的权威来源以及日志关联。详细连线与禁止绕过的路径见 [架构规范](references/architecture.md)。
 
 ## 核心流程
 
@@ -37,7 +43,7 @@ description: Use when designing, implementing, or reviewing customer-service wor
 
 - 登录状态、订单号或邮箱用于查找线索；按接入系统核验归属后才披露订单详情和处理订单。多笔订单不能默认选最新一笔。
 - 白名单必须来自确定的业务规则。政策缺失、接口失败和有效的空白名单是不同状态；进入正常退货也不代表保证退款资格。
-- 模型只输出 `reply` 与 `offer_id`。schema 合法仅表示结构正确；业务代码仍要验证整段对客内容。金额、百分比、币种、期限和执行条款不能由模型补造。
+- 生成方案回复时，模型只输出 `reply` 与 `offer_id`。schema 合法仅表示结构正确；业务代码仍要验证整段对客内容。金额、百分比、币种、期限和执行条款不能由模型补造。
 - 优先用受控模板和计算字段生成涉及权益的句子。无法确定自由文本是否与允许条款一致时，按校验失败处理，不能让模型给自己的回复放行。
 - 顾客必须接受已展示的具体方案与条款。没有展示记录、多个候选未选定或接受含糊时先澄清。订单或条款改变后重新展示并征求同意。
 - 默认首次出方案后最多再谈一次；每次重新生成都经过全部校验。明确拒绝时立即走正常退货，不再加一轮挽留。
@@ -46,6 +52,6 @@ description: Use when designing, implementing, or reviewing customer-service wor
 
 ## 交付与验证
 
-对所改路径给出入口、输入、状态、出口及异常处理，并注明哪些数值来自真实政策、哪些是设计默认。涉及执行时说明接受证据、幂等键、结果查询和审计字段；未接入真实服务时明确停留在哪个阶段。
+对所改路径给出入口、输入、状态、出口及异常处理，并注明哪些数值来自真实政策、哪些是设计默认。架构设计给出通用架构图、模块职责、读写权限及允许的数据流，标出防护拦截、人工接管和正常退货出口。涉及执行时说明接受证据、幂等键、结果查询和审计字段；未接入真实服务时明确停留在哪个阶段。
 
 用 [行为验收](references/acceptance.md) 中相关场景验证可观察的结果，尤其检查：白名单外内容零执行、明确拒绝零追加挽留、重复请求不重复发放、未知执行不记成功。公开材料使用通用术语和虚构数据，移除公司与供应商名称、产品标识、客户信息、来源图片和本机路径。
