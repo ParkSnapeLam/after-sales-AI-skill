@@ -1,0 +1,95 @@
+{
+  "example_only": true,
+  "policy_result": {
+    "status": "ok",
+    "order_id": "O-17",
+    "line_item_ids": ["L-1"],
+    "policy_version": "P-3",
+    "evaluated_at": "2030-01-15T09:00:00Z",
+    "offers": [
+      {
+        "offer_id": "C-17",
+        "offer_version": 1,
+        "order_id": "O-17",
+        "line_item_ids": ["L-1"],
+        "policy_version": "P-3",
+        "type": "store_credit",
+        "expires_at": "2030-01-15T10:00:00Z",
+        "amount_minor": 2000,
+        "currency": "CNY",
+        "percentage_basis_points": null,
+        "terms": {
+          "keep_item": true,
+          "credit_scope": "仅可在当前店铺使用",
+          "cash_withdrawal": false
+        },
+        "approved_claims": [
+          "顾客保留本次商品",
+          "确认执行成功后发放人民币20元店铺余额",
+          "余额仅限当前店铺使用，不可提现"
+        ]
+      }
+    ]
+  },
+  "model_response": {
+    "reply": "您可以保留商品，选择人民币20元店铺余额；余额仅限当前店铺使用，不可提现，确认执行成功后发放。您是否接受？",
+    "offer_id": "C-17"
+  },
+  "presentation": {
+    "presentation_id": "PR-17",
+    "offer_id": "C-17",
+    "offer_version": 1,
+    "policy_version": "P-3",
+    "terms_snapshot": {
+      "keep_item": true,
+      "amount_minor": 2000,
+      "currency": "CNY",
+      "credit_scope": "仅可在当前店铺使用",
+      "cash_withdrawal": false
+    },
+    "rendered_reply": "您可以保留商品，选择人民币20元店铺余额；余额仅限当前店铺使用，不可提现，确认执行成功后发放。您是否接受？",
+    "presented_at": "2030-01-15T09:01:00Z"
+  },
+  "consent": {
+    "consent_event_id": "CE-17",
+    "presentation_id": "PR-17",
+    "verified_subject_ref": "SUB-17",
+    "evidence_ref": "MSG-18",
+    "accepted_at": "2030-01-15T09:02:00Z"
+  },
+  "execution": {
+    "operation_id": "OP-17",
+    "idempotency_key": "credit:O-17:L-1:C-17:v1",
+    "order_id": "O-17",
+    "line_item_ids": ["L-1"],
+    "offer_id": "C-17",
+    "offer_version": 1,
+    "consent_event_id": "CE-17",
+    "parameters": {
+      "amount_minor": 2000,
+      "currency": "CNY",
+      "keep_item": true
+    },
+    "parameters_digest": "8e8400ddb4d44abb6a9d976a707d1711aec475bdd5f24b85b9f37ebfc77d392c",
+    "status": "confirmed",
+    "external_receipt_ref": "RC-17",
+    "confirmed_at": "2030-01-15T09:03:00Z"
+  },
+  "notification": {
+    "notification_id": "N-OP-17-confirmed-chat",
+    "operation_id": "OP-17",
+    "result_stage": "confirmed",
+    "channel": "chat",
+    "status": "sent",
+    "attempt_count": 1
+  },
+  "outcome": {
+    "accepted": true,
+    "execution_confirmed": true,
+    "finally_resolved": null,
+    "saved_amount_minor": null,
+    "currency": "CNY",
+    "metric_definition_version": null,
+    "reason": "余额已确认发放；最终解决证据和挽回金额口径尚未提供"
+  }
+}
